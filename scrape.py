@@ -1,12 +1,16 @@
+from time import time
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import datetime
+import time
 
 
-# TODO: Read course page to get to topic pages
+# Read main page to get to topic pages
 def get_topics(homepage_url):  
     response = requests.get(homepage_url)
+    # Rest time for website to chill 😎
+    time.sleep(5)
     soup = BeautifulSoup(response.text, 'html.parser')
     # Find all the "letter" sections to find the unordered list of topics
     topic_headings = soup.find_all(class_='letternav-head')
@@ -23,6 +27,8 @@ def get_topics(homepage_url):
 # Get courses from topic page
 def get_courses_from_topic_page(topic_url):
     response = requests.get(topic_url)
+    # Rest time for website to chill 😎
+    time.sleep(3)
     soup = BeautifulSoup(response.text, 'html.parser')
     course_blocks = soup.find_all(class_='courseblock')
     return course_blocks
@@ -54,16 +60,19 @@ base_url = 'http://guide.berkeley.edu'
 topic_urls = get_topics('http://guide.berkeley.edu/courses/')
 
 for topic_name, topic_url_rel in topic_urls:
-    # Use
+    # Use the topic name from the relative path (more likely not to cause issues)
     topic_name_inferred = topic_url_rel.split('/')[-2]
     print(datetime.datetime.now(), topic_name)
     
+    # Get all courses associated with topic
     topic_url = f'{base_url}{topic_url_rel}'
     course_blocks = get_courses_from_topic_page(topic_url=topic_url)
 
     # Iterate over each course and create a DataFrame
-    df = pd.DataFrame(data=(get_course_info(course_block) for course_block in course_blocks))
+    df = pd.DataFrame(
+            data=(get_course_info(course_block) 
+                    for course_block in course_blocks))
     df['topic'] = topic_name
 
-    # DEBUG: show the data makes sense
-    df.to_csv(f'{topic_name}.csv', index=False)
+    # Save topic to new CSV 
+    df.to_csv(f'{topic_name_inferred}.csv', index=False)
