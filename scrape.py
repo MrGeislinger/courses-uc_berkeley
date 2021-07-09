@@ -3,7 +3,12 @@ from bs4 import BeautifulSoup
 
 
 # TODO: Read course page to get to topic pages
-# TODO: Get courses from topic page
+# Get courses from topic page
+def get_courses_from_topic_page(topic_url):
+    response = requests.get(topic_url)
+    soup = BeautifulSoup(response.text, 'html.parser')
+    course_blocks = soup.find_all(class_='courseblock')
+    return course_blocks
 
 # Read in course
 def get_course_info(course_block_soup):
@@ -25,11 +30,14 @@ def get_course_info(course_block_soup):
     return data
 
 
+base_url = 'http://guide.berkeley.edu/courses/'
+topic_name = 'aerospc'
+topic_url = f'{base_url}{topic_name}'
+course_blocks = get_courses_from_topic_page(topic_url=topic_url)
 
-topic_url = 'http://guide.berkeley.edu/courses/aerospc/'
-response = requests.get(topic_url)
-soup = BeautifulSoup(response.text, 'html.parser')
+# Iterate over each course
+info = {topic_name: [get_course_info(course_block) 
+                        for course_block in course_blocks]}
 
-course_blocks = soup.find_all(class_='courseblock')
-info = get_course_info(course_blocks[0])
+# DEBUG: show the data makes sense
 print(info)
