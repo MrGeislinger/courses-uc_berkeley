@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-
+import pandas as pd
 
 # TODO: Read course page to get to topic pages
 # Get courses from topic page
@@ -35,9 +35,9 @@ topic_name = 'aerospc'
 topic_url = f'{base_url}{topic_name}'
 course_blocks = get_courses_from_topic_page(topic_url=topic_url)
 
-# Iterate over each course
-info = {topic_name: [get_course_info(course_block) 
-                        for course_block in course_blocks]}
+# Iterate over each course and create a DataFrame
+df = pd.DataFrame(data=(get_course_info(course_block) for course_block in course_blocks))
+df['topic'] = topic_name
 
 # DEBUG: show the data makes sense
-print(info)
+df.to_csv(f'{topic_name}.csv', index=False)
