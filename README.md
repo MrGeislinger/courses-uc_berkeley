@@ -15,6 +15,20 @@ Quick little project to scrape what UC Berkeley has up on its course catalog
 
 ## Usage
 
+### Scrape Data
+
 `python scrape.py` to scrape each topic into separate file (CSV)
 
 Enjoy! 🤌🏼 
+
+
+### Download Cached Data - (Previously scraped)
+
+If you scraped the data and store it somewhere as a zip, use the `download.py` script.
+
+```sh
+python download.py <URL> <EXTRACTION_DIR>
+```
+
+* `<URL>` is the URL to the zip file. If not given, a default cache from a GitHub release is used.
+* `<EXTRACTION_DIR>` is the directory to extract the zip into. If not given, defaults to the current working directory.
