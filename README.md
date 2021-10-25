@@ -12,6 +12,9 @@ Quick little project to scrape what UC Berkeley has up on its course catalog
    - Could use pip: `pip install -r requirements.txt`
 3. You're ready to roll!
 
+## Pure conda Setup
+
+Simply run `conda env create -f environment.yml` which should produce the same virtual environment setup seen above.
 
 ## Usage
 
