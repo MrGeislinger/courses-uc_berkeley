@@ -1,13 +1,15 @@
 from time import time
+from bs4.element import PageElement, ResultSet
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import datetime
 import time
+from typing import List, Dict
 
 
 # Read main page to get to topic pages
-def get_topics(homepage_url):  
+def get_topics(homepage_url: str) -> List[str]:  
     response = requests.get(homepage_url)
     # Rest time for website to chill 😎
     time.sleep(5)
@@ -25,7 +27,7 @@ def get_topics(homepage_url):
     return topics
 
 # Get courses from topic page
-def get_courses_from_topic_page(topic_url):
+def get_courses_from_topic_page(topic_url: str) -> List[PageElement]:
     response = requests.get(topic_url)
     # Rest time for website to chill 😎
     time.sleep(3)
@@ -34,7 +36,7 @@ def get_courses_from_topic_page(topic_url):
     return course_blocks
 
 # Read in course
-def get_course_info(course_block_soup):
+def get_course_info(course_block_soup: PageElement) -> Dict[str, str]:
     data = {}
     # Get basic course info like title, code, etc.
     basic_course_info = course_block_soup.find(class_='courseblocktitle')
@@ -56,23 +58,24 @@ def get_course_info(course_block_soup):
 
 
 ### Main Usage
-base_url = 'http://guide.berkeley.edu'
-topic_urls = get_topics('http://guide.berkeley.edu/courses/')
+if __name__ == '__main__':
+    base_url = 'http://guide.berkeley.edu'
+    topic_urls = get_topics('http://guide.berkeley.edu/courses/')
 
-for topic_name, topic_url_rel in topic_urls:
-    # Use the topic name from the relative path (more likely not to cause issues)
-    topic_name_inferred = topic_url_rel.split('/')[-2]
-    print(datetime.datetime.now(), topic_name)
-    
-    # Get all courses associated with topic
-    topic_url = f'{base_url}{topic_url_rel}'
-    course_blocks = get_courses_from_topic_page(topic_url=topic_url)
+    for topic_name, topic_url_rel in topic_urls:
+        # Use the topic name from the relative path (more likely not to cause issues)
+        topic_name_inferred = topic_url_rel.split('/')[-2]
+        print(datetime.datetime.now(), topic_name)
+        
+        # Get all courses associated with topic
+        topic_url = f'{base_url}{topic_url_rel}'
+        course_blocks = get_courses_from_topic_page(topic_url=topic_url)
 
-    # Iterate over each course and create a DataFrame
-    df = pd.DataFrame(
-            data=(get_course_info(course_block) 
-                    for course_block in course_blocks))
-    df['topic'] = topic_name
+        # Iterate over each course and create a DataFrame
+        df = pd.DataFrame(
+                data=(get_course_info(course_block) 
+                        for course_block in course_blocks))
+        df['topic'] = topic_name
 
-    # Save topic to new CSV 
-    df.to_csv(f'{topic_name_inferred}.csv', index=False)
+        # Save topic to new CSV 
+        df.to_csv(f'{topic_name_inferred}.csv', index=False)
